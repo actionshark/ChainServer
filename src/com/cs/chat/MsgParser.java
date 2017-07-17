@@ -11,7 +11,9 @@ public class MsgParser {
 	public static ReqMsg parse(byte[] data, int offset, int length) {
 		try {
 			String str = new String(data, offset, length);
-			Logger.getInstance().print(TAG, Level.V, str);
+			
+			Logger.getInstance().print(TAG, Level.D, str);
+			
 			JSONObject jo = JSONObject.fromObject(str);
 			
 			String uri = jo.getString(ChatMsg.KEY_URI);

@@ -35,7 +35,9 @@ public abstract class RspMsg extends ChatMsg {
 			}
 			
 			String str = jo.toString();
-			Logger.getInstance().print(TAG, Level.V, str);
+			
+			Logger.getInstance().print(TAG, Level.D, str);
+			
 			byte[] bs = str.getBytes();
 			tc.send(bs);
 		} catch (Exception e) {

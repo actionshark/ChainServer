@@ -43,9 +43,14 @@ public class Login extends ReqMsg {
 				ui.id = doc.getInteger(UserInfor.KEY_ID);
 				
 				UserInfor oui = server.geTalkServer().findUser(ui.id);
-				if (oui != null && oui.client == ui.client) {
-					Logger.getInstance().print(TAG, Level.D, String.format("user %d has login alreay", ui.id));
-					return;
+				if (oui != null) {
+					if (oui.client == client) {
+						Logger.getInstance().print(TAG, Level.D,
+							String.format("user %d has login alreay", ui.id));
+						return;
+					} else {
+						server.geTalkServer().removeUser(ui.id);
+					}
 				}
 				
 				ui.nickname = doc.getString(UserInfor.KEY_NICKNAME);

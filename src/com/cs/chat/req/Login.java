@@ -8,6 +8,8 @@ import com.cs.chat.UserInfor;
 import com.cs.chat.rsp.ShowToast;
 import com.cs.chat.rsp.UserInfo;
 import com.cs.main.DataBaseUtil;
+import com.js.log.Level;
+import com.js.log.Logger;
 import com.js.talk.TalkClient;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
@@ -15,9 +17,9 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 
-import net.sf.json.JSONObject;
-
 public class Login extends ReqMsg {
+	public static final String TAG = "Login";
+	
 	public TalkClient client;
 	
 	@Override
@@ -39,6 +41,13 @@ public class Login extends ReqMsg {
 				cur.close();
 				
 				ui.id = doc.getInteger(UserInfor.KEY_ID);
+				
+				UserInfor oui = server.geTalkServer().findUser(ui.id);
+				if (oui != null && oui.client == ui.client) {
+					Logger.getInstance().print(TAG, Level.D, String.format("user %d has login alreay", ui.id));
+					return;
+				}
+				
 				ui.nickname = doc.getString(UserInfor.KEY_NICKNAME);
 				ui.createTime = doc.getLong(UserInfor.KEY_CREATE_TIME);
 				ui.latestLogin = now;
@@ -77,16 +86,6 @@ public class Login extends ReqMsg {
 		
 		ui.client = client;
 		server.geTalkServer().addUser(ui);
-		
-		JSONObject jo = new JSONObject();
-		
-		jo.put(KEY_URI, "UserInfo");
-		jo.put(UserInfor.KEY_ACCOUNT, ui.account);
-		jo.put(UserInfor.KEY_ID, ui.id);
-		jo.put(UserInfor.KEY_NICKNAME, ui.nickname);
-		jo.put(UserInfor.KEY_CREATE_TIME, ui.createTime);
-		jo.put(UserInfor.KEY_LATEST_LOGIN, ui.latestLogin);
-		jo.put(UserInfor.KEY_LOGIN_TIMES, ui.loginTimes);
 		
 		UserInfo usin = new UserInfo();
 		usin.parseFrom(ui);

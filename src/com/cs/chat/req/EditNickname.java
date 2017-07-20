@@ -4,9 +4,9 @@ import org.bson.Document;
 
 import com.cs.chat.ChatServer;
 import com.cs.chat.ReqMsg;
-import com.cs.chat.UserInfor;
+import com.cs.chat.UserInfo;
 import com.cs.chat.rsp.ShowToast;
-import com.cs.chat.rsp.UserInfo;
+import com.cs.chat.rsp.PushUserInfo;
 import com.cs.main.DataBaseUtil;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
@@ -18,8 +18,8 @@ public class EditNickname extends ReqMsg {
 	public static final int MAX_LEN = 20;
 
 	@Override
-	public void perform(ChatServer server, UserInfor ui) throws Exception {
-		String nickname = mParams.getString(UserInfor.KEY_NICKNAME);
+	public void perform(ChatServer server, UserInfo ui) throws Exception {
+		String nickname = mParams.getString(UserInfo.KEY_NICKNAME);
 		if (nickname == null || nickname.length() < MIN_LEN || nickname.length() > MAX_LEN) {
 			ShowToast st = new ShowToast();
 			st.message = String.format("昵称长度为%d到%d", MIN_LEN, MAX_LEN);
@@ -30,7 +30,7 @@ public class EditNickname extends ReqMsg {
 		MongoCollection<Document> coll = DataBaseUtil.getDatabase().getCollection(
 			DataBaseUtil.COLL_USERINFO);
 
-		FindIterable<Document> fi = coll.find(new BasicDBObject(UserInfor.KEY_NICKNAME, nickname));
+		FindIterable<Document> fi = coll.find(new BasicDBObject(UserInfo.KEY_NICKNAME, nickname));
 
 		MongoCursor<Document> cur = fi.iterator();
 
@@ -44,16 +44,16 @@ public class EditNickname extends ReqMsg {
 		}
 
 		Document filter = new Document();
-		filter.append(UserInfor.KEY_ID, ui.id);
+		filter.append(UserInfo.KEY_ID, ui.id);
 
 		Document update = new Document();
-		update.append("$set", new Document(UserInfor.KEY_NICKNAME, nickname));
+		update.append("$set", new Document(UserInfo.KEY_NICKNAME, nickname));
 		
 		coll.updateOne(filter, update);
 		
 		ui.nickname = nickname;
 		
-		UserInfo usin = new UserInfo();
+		PushUserInfo usin = new PushUserInfo();
 		usin.parseFrom(ui);
 		usin.send(ui.client);
 		

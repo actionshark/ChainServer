@@ -4,9 +4,9 @@ import org.bson.Document;
 
 import com.cs.chat.ChatServer;
 import com.cs.chat.ReqMsg;
-import com.cs.chat.UserInfor;
+import com.cs.chat.UserInfo;
 import com.cs.chat.rsp.ShowToast;
-import com.cs.chat.rsp.UserInfo;
+import com.cs.chat.rsp.PushUserInfo;
 import com.cs.main.DataBaseUtil;
 import com.js.log.Level;
 import com.js.log.Logger;
@@ -23,15 +23,15 @@ public class Login extends ReqMsg {
 	public TalkClient client;
 	
 	@Override
-	public void perform(ChatServer server, UserInfor ui) throws Exception {
-		ui = new UserInfor();
-		ui.account = mParams.getString(UserInfor.KEY_ACCOUNT);
+	public void perform(ChatServer server, UserInfo ui) throws Exception {
+		ui = new UserInfo();
+		ui.account = mParams.getString(UserInfo.KEY_ACCOUNT);
 		
 		synchronized (DataBaseUtil.LOCK) {
 			MongoCollection<Document> coll = DataBaseUtil.getDatabase()
 				.getCollection(DataBaseUtil.COLL_USERINFO);
 			FindIterable<Document> it = coll.find(new BasicDBObject(
-				UserInfor.KEY_ACCOUNT, ui.account));
+				UserInfo.KEY_ACCOUNT, ui.account));
 			MongoCursor<Document> cur = it.iterator();
 			
 			long now = System.currentTimeMillis();
@@ -40,9 +40,9 @@ public class Login extends ReqMsg {
 				Document doc = cur.next();
 				cur.close();
 				
-				ui.id = doc.getInteger(UserInfor.KEY_ID);
+				ui.id = doc.getInteger(UserInfo.KEY_ID);
 				
-				UserInfor oui = server.geTalkServer().findUser(ui.id);
+				UserInfo oui = server.geTalkServer().findUser(ui.id);
 				if (oui != null) {
 					if (oui.client == client) {
 						Logger.getInstance().print(TAG, Level.D,
@@ -53,25 +53,25 @@ public class Login extends ReqMsg {
 					}
 				}
 				
-				ui.nickname = doc.getString(UserInfor.KEY_NICKNAME);
-				ui.createTime = doc.getLong(UserInfor.KEY_CREATE_TIME);
+				ui.nickname = doc.getString(UserInfo.KEY_NICKNAME);
+				ui.createTime = doc.getLong(UserInfo.KEY_CREATE_TIME);
 				ui.latestLogin = now;
-				doc.put(UserInfor.KEY_LATEST_LOGIN, ui.latestLogin);
-				ui.loginTimes = doc.getInteger(UserInfor.KEY_LOGIN_TIMES) + 1;
-				doc.put(UserInfor.KEY_LOGIN_TIMES, ui.loginTimes);
+				doc.put(UserInfo.KEY_LATEST_LOGIN, ui.latestLogin);
+				ui.loginTimes = doc.getInteger(UserInfo.KEY_LOGIN_TIMES) + 1;
+				doc.put(UserInfo.KEY_LOGIN_TIMES, ui.loginTimes);
 				
-				coll.replaceOne(Filters.eq(UserInfor.KEY_ID, ui.id), doc);
+				coll.replaceOne(Filters.eq(UserInfo.KEY_ID, ui.id), doc);
 			} else {
 				cur.close();
 				
 				ui.id = 1;
 				
-				it = coll.find().sort(new BasicDBObject(UserInfor.KEY_ID, -1)).limit(1);
+				it = coll.find().sort(new BasicDBObject(UserInfo.KEY_ID, -1)).limit(1);
 				cur = it.iterator();
 				if (cur.hasNext()) {
 					Document doc = cur.next();
 					cur.close();
-					ui.id = doc.getInteger(UserInfor.KEY_ID) + 1;
+					ui.id = doc.getInteger(UserInfo.KEY_ID) + 1;
 				}
 				
 				ui.createTime = now;
@@ -79,11 +79,11 @@ public class Login extends ReqMsg {
 				ui.loginTimes = 1;
 				
 				Document doc = new Document();
-				doc.put(UserInfor.KEY_ACCOUNT, ui.account);
-				doc.put(UserInfor.KEY_ID, ui.id);
-				doc.put(UserInfor.KEY_CREATE_TIME, ui.createTime);
-				doc.put(UserInfor.KEY_LATEST_LOGIN, ui.latestLogin);
-				doc.put(UserInfor.KEY_LOGIN_TIMES, ui.loginTimes);
+				doc.put(UserInfo.KEY_ACCOUNT, ui.account);
+				doc.put(UserInfo.KEY_ID, ui.id);
+				doc.put(UserInfo.KEY_CREATE_TIME, ui.createTime);
+				doc.put(UserInfo.KEY_LATEST_LOGIN, ui.latestLogin);
+				doc.put(UserInfo.KEY_LOGIN_TIMES, ui.loginTimes);
 				
 				coll.insertOne(doc);
 			}
@@ -92,7 +92,7 @@ public class Login extends ReqMsg {
 		ui.client = client;
 		server.geTalkServer().addUser(ui);
 		
-		UserInfo usin = new UserInfo();
+		PushUserInfo usin = new PushUserInfo();
 		usin.parseFrom(ui);
 		usin.send(ui.client);
 		

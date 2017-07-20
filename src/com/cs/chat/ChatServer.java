@@ -10,22 +10,22 @@ import com.js.talk.TalkServer;
 public class ChatServer {
 	public static final String TAG = ChatServer.class.getSimpleName();
 	
-	private TalkServer<UserInfor> mServer;
+	private TalkServer<UserInfo> mServer;
 	
-	public void setServer(TalkServer<UserInfor> server) {
+	public void setServer(TalkServer<UserInfo> server) {
 		mServer = server;
 	}
 	
-	public TalkServer<UserInfor> geTalkServer() {
+	public TalkServer<UserInfo> geTalkServer() {
 		return mServer;
 	}
 	
 	public void start() {
 		mServer.start();
-		mServer.setListener(new ITalkServerListener<UserInfor>() {
+		mServer.setListener(new ITalkServerListener<UserInfo>() {
 			@Override
-			public void onReceived(TalkServer<UserInfor> server, TalkClient client,
-					UserInfor ui, byte[] data, int offset, int length) {
+			public void onReceived(TalkServer<UserInfo> server, TalkClient client,
+					UserInfo ui, byte[] data, int offset, int length) {
 
 				ReqMsg msg = MsgParser.parse(data, offset, length);
 				if (msg == null) {
@@ -44,8 +44,8 @@ public class ChatServer {
 			}
 			
 			@Override
-			public void onLeaved(TalkServer<UserInfor> server, TalkClient client,
-					UserInfor ui) {
+			public void onLeaved(TalkServer<UserInfo> server, TalkClient client,
+					UserInfo ui) {
 				
 			}
 		});

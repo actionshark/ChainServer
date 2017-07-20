@@ -1,7 +1,7 @@
 package com.cs.main;
 
 import com.cs.chat.ChatServer;
-import com.cs.chat.UserInfor;
+import com.cs.chat.UserInfo;
 import com.js.log.FileLogger;
 import com.js.log.Level;
 import com.js.log.Logger;
@@ -58,7 +58,7 @@ public class Main {
 		NetServer ns = new NetServer();
 		ns.setPort(port);
 		
-		TalkServer<UserInfor> ts = new TalkServer<UserInfor>();
+		TalkServer<UserInfo> ts = new TalkServer<UserInfo>();
 		ts.setServer(ns);
 		
 		ChatServer cs = new ChatServer();

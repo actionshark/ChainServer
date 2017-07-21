@@ -21,7 +21,6 @@ public class ChatServer {
 	}
 	
 	public void start() {
-		mServer.start();
 		mServer.setListener(new ITalkServerListener<UserInfo>() {
 			@Override
 			public void onReceived(TalkServer<UserInfo> server, TalkClient client,
@@ -49,5 +48,7 @@ public class ChatServer {
 				
 			}
 		});
+		
+		mServer.start();
 	}
 }

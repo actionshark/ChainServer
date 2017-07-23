@@ -36,7 +36,13 @@ public class ChatServer {
 				}
 				
 				try {
-					msg.perform(ChatServer.this, ui);
+					if (ui == null) {
+						msg.perform(ChatServer.this, ui);
+					} else {
+						synchronized (ui) {
+							msg.perform(ChatServer.this, ui);
+						}
+					}
 				} catch (Exception e) {
 					Logger.getInstance().print(TAG, Level.E, e);
 				}

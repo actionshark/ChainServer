@@ -1,5 +1,7 @@
 package com.cs.chat;
 
+import com.cs.battle.Battle;
+
 public class UserInfo extends com.js.talk.UserInfo {
 	public static final String KEY_ID = "id";
 	public static final String KEY_ACCOUNT = "account";
@@ -14,4 +16,14 @@ public class UserInfo extends com.js.talk.UserInfo {
 	public long createTime;
 	public long latestLogin;
 	public int loginTimes;
+	
+	private Battle mBattle;
+	
+	public Battle getBattle() {
+		return mBattle;
+	}
+	
+	public void setBattle(Battle battle) {
+		mBattle = battle;
+	}
 }

@@ -1,5 +1,6 @@
 package com.cs.main;
 
+import com.cs.battle.BattleMgr;
 import com.cs.chat.ChatServer;
 import com.cs.chat.UserInfo;
 import com.js.log.FileLogger;
@@ -64,5 +65,7 @@ public class Main {
 		ChatServer cs = new ChatServer();
 		cs.setServer(ts);
 		cs.start();
+		
+		BattleMgr.start(ts);
 	}
 }

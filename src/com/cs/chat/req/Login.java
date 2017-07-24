@@ -26,6 +26,7 @@ public class Login extends ReqMsg {
 	public void perform(ChatServer server, UserInfo ui) throws Exception {
 		ui = new UserInfo();
 		ui.account = mParams.getString(UserInfo.KEY_ACCOUNT);
+		ui.deviceName = mParams.getString(UserInfo.KEY_DEVICE_NAME);
 		
 		synchronized (DataBaseUtil.LOCK) {
 			MongoCollection<Document> coll = DataBaseUtil.getDatabase()
@@ -54,6 +55,7 @@ public class Login extends ReqMsg {
 				}
 				
 				ui.nickname = doc.getString(UserInfo.KEY_NICKNAME);
+				doc.put(UserInfo.KEY_DEVICE_NAME, ui.deviceName);
 				ui.createTime = doc.getLong(UserInfo.KEY_CREATE_TIME);
 				ui.latestLogin = now;
 				doc.put(UserInfo.KEY_LATEST_LOGIN, ui.latestLogin);
@@ -81,6 +83,7 @@ public class Login extends ReqMsg {
 				Document doc = new Document();
 				doc.put(UserInfo.KEY_ACCOUNT, ui.account);
 				doc.put(UserInfo.KEY_ID, ui.id);
+				doc.put(UserInfo.KEY_DEVICE_NAME, ui.deviceName);
 				doc.put(UserInfo.KEY_CREATE_TIME, ui.createTime);
 				doc.put(UserInfo.KEY_LATEST_LOGIN, ui.latestLogin);
 				doc.put(UserInfo.KEY_LOGIN_TIMES, ui.loginTimes);

@@ -1,6 +1,7 @@
 package com.cs.chat.req;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import com.cs.chat.ChatServer;
 import com.cs.chat.ReqMsg;
@@ -43,12 +44,9 @@ public class EditNickname extends ReqMsg {
 			return;
 		}
 
-		Document filter = new Document();
-		filter.append(UserInfo.KEY_ID, ui.id);
-
+		Bson filter = new BasicDBObject(UserInfo.KEY_ID, ui.id);
 		Document update = new Document();
 		update.append("$set", new Document(UserInfo.KEY_NICKNAME, nickname));
-		
 		coll.updateOne(filter, update);
 		
 		ui.nickname = nickname;

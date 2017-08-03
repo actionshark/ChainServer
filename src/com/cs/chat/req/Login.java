@@ -1,11 +1,13 @@
 package com.cs.chat.req;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import com.cs.chat.ChatServer;
 import com.cs.chat.ReqMsg;
 import com.cs.chat.UserInfo;
 import com.cs.chat.rsp.ShowToast;
+import com.cs.chat.rsp.PushLineup;
 import com.cs.chat.rsp.PushUserInfo;
 import com.cs.main.DataBaseUtil;
 import com.js.log.Level;
@@ -15,7 +17,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
-import com.mongodb.client.model.Filters;
 
 public class Login extends ReqMsg {
 	public static final String TAG = "Login";
@@ -62,7 +63,10 @@ public class Login extends ReqMsg {
 				ui.loginTimes = doc.getInteger(UserInfo.KEY_LOGIN_TIMES) + 1;
 				doc.put(UserInfo.KEY_LOGIN_TIMES, ui.loginTimes);
 				
-				coll.replaceOne(Filters.eq(UserInfo.KEY_ID, ui.id), doc);
+				Bson filter = new BasicDBObject(UserInfo.KEY_ID, ui.id);
+				Document update = new Document();
+				update.append("$set", doc);
+				coll.updateOne(filter, update);
 			} else {
 				cur.close();
 				
@@ -102,5 +106,21 @@ public class Login extends ReqMsg {
 		ShowToast st = new ShowToast();
 		st.message = "登录成功";
 		st.send(ui.client);
+		
+		MongoCollection<Document> coll = DataBaseUtil.getDatabase()
+			.getCollection(DataBaseUtil.COLL_LINEUP);
+		FindIterable<Document> it = coll.find(new BasicDBObject(
+			UserInfo.KEY_ID, ui.id));
+		MongoCursor<Document> cur = it.iterator();
+		
+		if (cur.hasNext()) {
+			Document doc = cur.next();
+			
+			PushLineup pl = new PushLineup();
+			pl.data = doc.getString("data");
+			pl.send(ui.client);
+		}
+		
+		cur.close();
 	}
 }

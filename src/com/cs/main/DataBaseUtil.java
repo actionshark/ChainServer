@@ -8,6 +8,7 @@ public class DataBaseUtil {
 	private static MongoDatabase sDatabase;
 	
 	public static final String COLL_USERINFO = "userinfo";
+	public static final String COLL_LINEUP = "lineup";
 	
 	public static final Object LOCK = new Object();
 	
